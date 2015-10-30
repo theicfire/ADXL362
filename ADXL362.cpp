@@ -119,6 +119,7 @@ int16_t ADXL362::readTemp(){
 	return TEMP;
 }
 
+// NOTE: Called by an interrupt! Don't print, don't modify global variables
 void ADXL362::readXYZTData(int16_t &XData, int16_t &YData, int16_t &ZData, int16_t &Temperature){
 	  // burst SPI read
 	  // A burst read of all three axis is required to guarantee all measurements correspond to same sample time
@@ -134,13 +135,6 @@ void ADXL362::readXYZTData(int16_t &XData, int16_t &YData, int16_t &ZData, int16
 	  Temperature = SPI.transfer(0x00);
 	  Temperature = Temperature + (SPI.transfer(0x00) << 8);
 	  digitalWrite(slaveSelectPin, HIGH);
-  
-#ifdef ADXL362_DEBUG
-	Serial.print("XDATA = "); Serial.print(XData); 
-	Serial.print("\tYDATA = "); Serial.print(YData); 
-	Serial.print("\tZDATA = "); Serial.print(ZData); 
-	Serial.print("\tTemperature = "); Serial.println(Temperature);
-#endif
 }
 
 void ADXL362::setupDCActivityInterrupt(int16_t threshold, byte time){
