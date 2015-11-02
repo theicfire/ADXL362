@@ -44,7 +44,7 @@ public:
 	void setupDCInactivityInterrupt(int16_t threshold, int16_t time);
     void setupACActivityInterrupt(int16_t threshold, byte time);
 	void setupACInactivityInterrupt(int16_t threshold, int16_t time);
-	boolean  readFIFO(int16_t &last_x, int16_t &last_y, int16_t &last_z);
+	boolean  readFIFO(int16_t &last_x, int16_t &last_y, int16_t &last_z, uint16_t threshold);
 	
 	// need to add the following functions
 	// void mapINT1(

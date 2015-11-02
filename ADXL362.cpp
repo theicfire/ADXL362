@@ -137,23 +137,12 @@ void ADXL362::readXYZTData(int16_t &XData, int16_t &YData, int16_t &ZData, int16
 	  digitalWrite(slaveSelectPin, HIGH);
 }
 
-boolean ADXL362::readFIFO(int16_t &last_x, int16_t &last_y, int16_t &last_z) {
-	  int16_t fifo_entries;
+boolean ADXL362::readFIFO(int16_t &last_x, int16_t &last_y, int16_t &last_z, uint16_t threshold) {
 	  int16_t a;
 	  int16_t b;
-	  int16_t c;
-	  int d;
+	  int c;
 	  int16_t readings[] = {-1, -1, -1};
 	  boolean ret = false;
-	  //digitalWrite(slaveSelectPin, LOW);
-	  //SPI.transfer(0x0B);  // read instruction
-	  //SPI.transfer(0x0C);  // Start at XData Reg
-	  //fifo_entries = SPI.transfer(0x00);
-	  //fifo_entries = fifo_entries + (SPI.transfer(0x00) << 8);
-	  //digitalWrite(slaveSelectPin, HIGH);
-
-	  //Serial.print("entries: ");
-	  //Serial.println(fifo_entries);
 
 	  digitalWrite(slaveSelectPin, LOW);
 	  SPI.transfer(0x0D);
@@ -161,12 +150,11 @@ boolean ADXL362::readFIFO(int16_t &last_x, int16_t &last_y, int16_t &last_z) {
 		  for (int i = 0; i < 3; i++) {
 			  a = SPI.transfer(0x00);
 			  b = SPI.transfer(0x00);
-			  //c = b & 0xc0;
-			  d = a + ((b & 0x3F) << 8);
-			  if (d > 5000) {
-				  d = - (((~d) & 0x3FFF) + 1);
+			  c = a + ((b & 0x3F) << 8);
+			  if (c > 5000) {
+				  c = - (((~c) & 0x3FFF) + 1);
 			  }
-			  readings[i] = d;
+			  readings[i] = c;
 		  }
 		  if (readings[0] == 0 && readings[1] == 0 && readings[2] == 0) {
 			  break;
@@ -175,7 +163,7 @@ boolean ADXL362::readFIFO(int16_t &last_x, int16_t &last_y, int16_t &last_z) {
 		  unsigned long uy = last_y - readings[1];
 		  unsigned long uz = last_z - readings[2];
 		  unsigned long dist = ux * ux + uy * uy + uz * uz;
-		  if (dist > 300) {
+		  if (dist > threshold) {
 		  //Serial.println(dist);
 			  last_x = readings[0];
 			  last_y = readings[1];
